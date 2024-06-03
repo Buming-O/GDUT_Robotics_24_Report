@@ -1,8 +1,0 @@
-Matrix_dh_mex.mexw64
-Matrix_dh		Matrix_dh
-Matrix_dh_atexit		Matrix_dh_atexit
-Matrix_dh_initialize		Matrix_dh_initialize
-Matrix_dh_terminate		Matrix_dh_terminate
-emlrtMexFcnProperties		emlrtMexFcnProperties
-mexFunction		mexFunction
-mexfilerequiredapiversion		mexfilerequiredapiversion

@@ -20,10 +20,7 @@ Build;
 % Scara.teach();
 % Scara.jacob0(qq)
 % Scara.jacobe(qq)
-for i = 1:5
-       Link_1= Matrix_dh(Link_1,i);
-       Link_2= Matrix_dh(Link_2,i);
-       Link_3= Matrix_dh(Link_3,i);
-end
+
 % pinv(j1)
 % pinv(j2)
+
