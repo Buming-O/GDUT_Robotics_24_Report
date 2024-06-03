@@ -12,6 +12,8 @@ Link(5).th=inputArg(4)*ToRad;
 %%
 for i=1:5
 Link=Matrix_dh(Link,i);
+% Link=Matrix_dh_mex(Link,i);
+
 end
 
 for i=2:5
