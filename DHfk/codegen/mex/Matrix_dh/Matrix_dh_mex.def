@@ -1,0 +1,9 @@
+LIBRARY Matrix_dh_mex.mexw64
+EXPORTS
+mexFunction
+mexfilerequiredapiversion
+emlrtMexFcnProperties
+Matrix_dh
+Matrix_dh_initialize
+Matrix_dh_terminate
+Matrix_dh_atexit

@@ -2,7 +2,7 @@ clc;
 clear all;
 close all;
 num=0;
-learning_rate = 1.3;
+learning_rate = 1;
 ToDeg = 180/pi;
 ToRad = pi/180;
 global Link_1
@@ -26,22 +26,26 @@ T2_pos=[-17,37.7,-53.57]';     %期望位置
 T3_pos=[-2.3,-87.82,-57.91]';     %期望位置
 
 %% 绘制机械臂初始位姿及末端姿态
-DHFk_hand(q_1(2:end),q_2(2:end),q_3(2:end));
+DHFk_hand(q_1(2:end),q_2(2:end),q_3(2:end),true);
 pause;
 plot3(T1_pos(1),T1_pos(2),T1_pos(3),'rX'); hold on;
 plot3(T2_pos(1),T2_pos(2),T2_pos(3),'gX'); hold on;
 plot3(T3_pos(1),T3_pos(2),T3_pos(3),'bX'); hold on;
 view(-21,12);
 pause;  cla;
-
+hold on;
 %%
 done_1 = false;
 done_2 = false;
 done_3 = false;
+load('test_j_matrix.mat', 'test_j_matrix');
+global mf;
+mf = matlabFunction(test_j_matrix);
+profile on; % 开启性能分析
 tic
 while ~(done_1 && done_2 && done_3)
 %     disp(['Done_1: ', num2str(done_1),'Done_2: ', num2str(done_2),'Done_3: ', num2str(done_3)]);
-    DHFk_hand(q_1(2:end),q_2(2:end),q_3(2:end)); % FK计算并绘制机器人
+    DHFk_hand(q_1(2:end),q_2(2:end),q_3(2:end),false); % FK计算并绘制机器人
     if ~done_1
         [q_1, done_1] = IK_Sol(Link_1, q_1, T1_pos, learning_rate);
     end
@@ -52,15 +56,18 @@ while ~(done_1 && done_2 && done_3)
         [q_3, done_3] = IK_Sol(Link_3, q_3, T3_pos, learning_rate);
     end
     num=num+1;
-    hold on;
 end
-disp(['迭代次数: ', num2str(num)]);
+% disp(['迭代次数: ', num2str(num)]);
 toc
-%%再次绘制机器人保持图像
+profile off; % 关闭性能分析
+profile viewer; % 显示性能分析结果
+
+
+%% 再次绘制机器人保持图像
 plot3(T1_pos(1),T1_pos(2),T1_pos(3),'rX'); hold on;
 plot3(T2_pos(1),T2_pos(2),T2_pos(3),'gX'); hold on;
 plot3(T3_pos(1),T3_pos(2),T3_pos(3),'bX'); hold on;
-DHFk_hand(q_1(2:end),q_2(2:end),q_3(2:end));
+DHFk_hand(q_1(2:end),q_2(2:end),q_3(2:end),true);
 
 
 

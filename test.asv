@@ -1,5 +1,0 @@
-j1=Jacobian4DoF(Link_1,[0,10,60,60,60])
-j2=Jacobian_finger([0,10,60,60,60])
-
-pinv(j1)
-p
