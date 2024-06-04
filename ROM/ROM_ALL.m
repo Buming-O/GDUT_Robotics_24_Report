@@ -21,7 +21,7 @@ grid on;hold on;
 workspace_points1 = [];
 workspace_points2 = [];
 workspace_points3 = [];
-num_samples = 4000;
+num_samples = 5000;
 
 for sample = 1:num_samples
     th1 = th_ranges(1,1) + (th_ranges(1,2) - th_ranges(1,1)) * rand* ToRad;

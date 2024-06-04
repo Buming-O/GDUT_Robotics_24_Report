@@ -2,9 +2,13 @@ clc;
 clear all;
 close all;
 num=0;
-learning_rate = 0.8;
+learning_rate = 0.9;
 ToDeg = 180/pi;
 ToRad = pi/180;
+% 定义球的半径和中心位置
+ball_radius = 20;
+ball_center = [0, 0, -50];
+
 global Link_1
 global Link_2
 global Link_3
@@ -24,16 +28,26 @@ q_2=[120,0,0,0,0];
 q_3=[-120,0,0,0,0];
 
 %% 输入目标末端位置及旋转矩阵
-T1_pos=[20,0,-51.65]';     %期望位置
-T2_pos=[-8,18.25,-51.65]';     %期望位置
-T3_pos=[-7.78,-17.75,-51.65]';     %期望位置
+% T1_pos=[20,0,-51.65]';     %期望位置
+% T2_pos=[-8,18.25,-51.65]';     %期望位置
+% T3_pos=[-7.78,-17.75,-51.65]';     %期望位置
+theta1 = 0; % 接触点1的角度
+phi1 = pi/2;  % 接触点1的角度
+theta2 = 2*pi/3; % 接触点2的角度
+phi2 = pi/2;  % 接触点2的角度
+theta3 = -2*pi/3; % 接触点3的角度
+phi3 = pi/2;  % 接触点3的角度
+T1_pos=ball_center + ball_radius * [cos(theta1) * sin(phi1), sin(theta1) * sin(phi1), cos(phi1)];
+T2_pos=ball_center + ball_radius * [cos(theta2) * sin(phi2), sin(theta2) * sin(phi2), cos(phi2)];
+T3_pos=ball_center + ball_radius * [cos(theta3) * sin(phi3), sin(theta3) * sin(phi3), cos(phi3)];
 
 %% 绘制机械臂初始位姿及末端姿态
 DHFk_hand(q_1(2:end),q_2(2:end),q_3(2:end),true);
-plot3(T1_pos(1),T1_pos(2),T1_pos(3),'rX'); hold on;
-plot3(T2_pos(1),T2_pos(2),T2_pos(3),'gX'); hold on;
-plot3(T3_pos(1),T3_pos(2),T3_pos(3),'bX'); hold on;
-DrawSphere([0,0,-50],20,0);
+plot3(T1_pos(1),T1_pos(2),T1_pos(3),'ro', 'MarkerSize', 5, 'LineWidth', 3); hold on;
+plot3(T2_pos(1),T2_pos(2),T2_pos(3),'go', 'MarkerSize', 5, 'LineWidth', 3); hold on;
+plot3(T3_pos(1),T3_pos(2),T3_pos(3),'bo', 'MarkerSize', 5, 'LineWidth', 3); hold on;
+DrawSphere(ball_center,ball_radius,0);
+drawnow;
 view(-21,12);
 pause; 
 cla;hold on;
@@ -69,11 +83,12 @@ disp(['迭代次数: ', num2str(num)]);
 disp(['Done_1: ', num2str(done_1),'  |  Done_2: ', num2str(done_2),'  |  Done_3: ', num2str(done_3)]);
 
 %% 再次绘制机器人保持图像
-plot3(T1_pos(1),T1_pos(2),T1_pos(3),'rX'); hold on;
-plot3(T2_pos(1),T2_pos(2),T2_pos(3),'gX'); hold on;
-plot3(T3_pos(1),T3_pos(2),T3_pos(3),'bX'); hold on;
-DrawSphere([0,0,-50],20,0);
+plot3(T1_pos(1),T1_pos(2),T1_pos(3),'ro', 'MarkerSize', 5, 'LineWidth', 3); hold on;
+plot3(T2_pos(1),T2_pos(2),T2_pos(3),'go', 'MarkerSize', 5, 'LineWidth', 3); hold on;
+plot3(T3_pos(1),T3_pos(2),T3_pos(3),'bo', 'MarkerSize', 5, 'LineWidth', 3); hold on;
+DrawSphere(ball_center,ball_radius,0);
 DHFk_hand(q_1(2:end),q_2(2:end),q_3(2:end),true);
+drawnow;
 
 
 

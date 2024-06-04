@@ -2,7 +2,6 @@ function Link=Matrix_dh(Link,i)
 % Caculate the D-H Matrix
 % ToDeg = 180/pi;
 % ToRad = pi/180;
-% global Link;
 C=cos(Link(i).th);
 S=sin(Link(i).th);
 Ca=cos(Link(i).alf);

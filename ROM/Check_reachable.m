@@ -4,16 +4,16 @@ load('workspace_points2.mat', 'workspace_points2');
 load('workspace_points3.mat', 'workspace_points3');
 
 % 定义球的半径
-ball_radius = 20;
+ball_radius = 40;
 
 % 定义网格范围和分辨率
 x_range = -100:5:100;
 y_range = -100:5:100;
-z_range = -80:2:0;
+z_range = -80:2:0-ball_radius;
 % 初始化可达空间集合
 reachable_points = [];
 %%
-profile on; % 开启性能分析
+% profile on; % 开启性能分析
 % 遍历网格中的每一个位置
 for x = x_range
     for y = y_range
@@ -36,8 +36,8 @@ for x = x_range
         end
     end
 end
-profile off; % 关闭性能分析
-profile viewer; % 显示性能分析结果
+% profile off; % 关闭性能分析
+% profile viewer; % 显示性能分析结果
 %%
 % 绘制可达空间
 figure;
