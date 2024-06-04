@@ -67,23 +67,10 @@ end
 scatter3(workspace_points1(:,1), workspace_points1(:,2), workspace_points1(:,3), 'r.');
 scatter3(workspace_points2(:,1), workspace_points2(:,2), workspace_points2(:,3), 'g.');
 scatter3(workspace_points3(:,1), workspace_points3(:,2), workspace_points3(:,3), 'b.');
+%%
 % save('workspace_points1.mat', 'workspace_points1');
 % save('workspace_points2.mat', 'workspace_points2');
 % save('workspace_points3.mat', 'workspace_points3');
-% %% 检查球的位置
-% dist_to_workspace1 = pdist2(workspace_points1, ball_center);
-% dist_to_workspace2 = pdist2(workspace_points2, ball_center);
-% dist_to_workspace3 = pdist2(workspace_points3, ball_center);
-% 
-% is_reachable1 = any(dist_to_workspace1 < ball_radius);
-% is_reachable2 = any(dist_to_workspace2 < ball_radius);
-% is_reachable3 = any(dist_to_workspace3 < ball_radius);
-% 
-% if is_reachable1 && is_reachable2 && is_reachable3
-%     disp('球在所有手指的工作空间内');
-% else
-%     disp('球不在所有手指的工作空间内');
-% end
 
 %%
 plot3(0, 0, 0, 'g+', 'MarkerSize', 10);

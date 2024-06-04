@@ -31,43 +31,32 @@ ball_center = [0, -46, -65];
 load('workspace_points1.mat', 'workspace_points1');
 load('workspace_points2.mat', 'workspace_points2');
 load('workspace_points3.mat', 'workspace_points3');
-
-
-% 检查球心是否在每个手指的工作空间内
-is_in_workspace1 = is_point_in_workspace(workspace_points1, ball_center);
-is_in_workspace2 = is_point_in_workspace(workspace_points2, ball_center);
-is_in_workspace3 = is_point_in_workspace(workspace_points3, ball_center);
-disp([is_in_workspace1,is_in_workspace2,is_in_workspace3])
-% 显示结果
-if all(is_in_workspace1) && all(is_in_workspace2) && all(is_in_workspace3)
-    disp('球心在所有手指的工作空间内');
-else
-    disp('球心不在所有手指的工作空间内');
-end
-
-% 绘制球和工作空间
+dt1 = alphaShape(workspace_points1,60);
+dt2 = alphaShape(workspace_points2,60);
+dt3 = alphaShape(workspace_points3,60);
+% 绘制凸包
 figure;
-DrawSphere(ball_center,ball_radius,0);
 hold on;
-plot3(workspace_points1(:, 1), workspace_points1(:, 2), workspace_points1(:, 3), 'ro', 'MarkerSize', 2);
-plot3(workspace_points2(:, 1), workspace_points2(:, 2), workspace_points2(:, 3), 'go', 'MarkerSize', 2);
-plot3(workspace_points3(:, 1), workspace_points3(:, 2), workspace_points3(:, 3), 'bo', 'MarkerSize', 2);
-
-plot3(ball_center(1), ball_center(2), ball_center(3), 'k*', 'MarkerSize', 10, 'LineWidth', 2);
-
+% trisurf(convexHull(dt1), dt1.Points(:,1), dt1.Points(:,2), dt1.Points(:,3), ...
+% 'EdgeColor', 'r', 'FaceColor', [0.8, 0.8, 0.8], 'LineWidth', 2);
+% trisurf(convexHull(dt2), dt2.Points(:,1), dt2.Points(:,2), dt2.Points(:,3), ...
+% 'EdgeColor', 'g', 'FaceColor', [0.8, 0.8, 0.8], 'LineWidth', 2);
+% trisurf(convexHull(dt3), dt3.Points(:,1), dt3.Points(:,2), dt3.Points(:,3), ...
+% 'EdgeColor', 'b', 'FaceColor', [0.8, 0.8, 0.8], 'LineWidth', 2);
+disp(dt1.Alpha)
+plot(dt1);
+plot(dt2);
+plot(dt3);
+scatter3(workspace_points1(:,1), workspace_points1(:,2), workspace_points1(:,3), 'r.');
+scatter3(workspace_points2(:,1), workspace_points2(:,2), workspace_points2(:,3), 'g.');
+scatter3(workspace_points3(:,1), workspace_points3(:,2), workspace_points3(:,3), 'b.');
+% 添加坐标轴标签和标题
 xlabel('X');
 ylabel('Y');
 zlabel('Z');
-title('球心与工作空间');
-grid on;
-hold off;
-axis equal;
+title('凸包和检查点');
 
-function is_in_workspace = is_point_in_workspace(workspace_points, point)
-    % 使用Delaunay三角剖分检查点是否在多边形体内
-    dt = delaunayTriangulation(workspace_points);
-    [~, volume] = convexHull(dt);
-    % 检查点是否在工作空间的凸包内
-    [~, point_inside] = tsearchn(dt.Points, dt.ConnectivityList, point);
-    is_in_workspace = ~isnan(point_inside);
-end
+% 其他可视化设置
+grid on;
+axis equal;
+view(3); % 3D 视图

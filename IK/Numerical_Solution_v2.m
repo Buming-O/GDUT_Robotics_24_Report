@@ -55,9 +55,9 @@ cla;hold on;
 done_1 = false;
 done_2 = false;
 done_3 = false;
-load('test_j_matrix.mat', 'test_j_matrix');
+load('J_matrix.mat', 'J_matrix');
 global mf;
-mf = matlabFunction(test_j_matrix);
+mf = matlabFunction(J_matrix);
 % profile on; % 开启性能分析
 tic
 while ~(done_1 && done_2 && done_3)

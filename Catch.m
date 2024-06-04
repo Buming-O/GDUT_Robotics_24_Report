@@ -10,12 +10,16 @@ load('workspace_points1.mat', 'workspace_points1');
 load('workspace_points2.mat', 'workspace_points2');
 load('workspace_points3.mat', 'workspace_points3');
 % 使用Delaunay三角剖分检查点是否在多边形体内
-dt1 = delaunayTriangulation(workspace_points1);
-dt2 = delaunayTriangulation(workspace_points2);
-dt3 = delaunayTriangulation(workspace_points3);
+% dt1 = delaunayTriangulation(workspace_points1);
+% dt2 = delaunayTriangulation(workspace_points2);
+% dt3 = delaunayTriangulation(workspace_points3);
+% 使用alphaShape检查点是否在多边形体内
+shp1 = alphaShape(workspace_points1,60);
+shp2 = alphaShape(workspace_points2,60);
+shp3 = alphaShape(workspace_points3,60);
 % 定义球的半径和中心位置
 ball_radius = 40;
-ball_center = [0, 0, -85];
+ball_center = [10, 10, -70];
 
 global Link_1
 global Link_2
@@ -45,56 +49,71 @@ Z = ball_radius * cos(Phi) + ball_center(3);
 candidate_points = [X(:), Y(:), Z(:)];
 % 划分候选接触点到三个象限
 theta_deg = rad2deg(Theta(:));
-points_sector1 = candidate_points(theta_deg >= -20 & theta_deg < 20, :);
-points_sector2 = candidate_points(theta_deg >= 110 & theta_deg < 130, :);
-points_sector3 = candidate_points(theta_deg >= 230 & theta_deg < 250, :);
+angle_threshold = 20;
+points_sector1 = candidate_points(theta_deg >= 0-angle_threshold & theta_deg < 0+angle_threshold, :);
+points_sector2 = candidate_points(theta_deg >= 120-angle_threshold & theta_deg < 120+angle_threshold, :);
+points_sector3 = candidate_points(theta_deg >= 240-angle_threshold & theta_deg < 240+angle_threshold, :);
 
-% 初始化可达的接触点
-reachable_points1 = [];
-reachable_points2 = [];
-reachable_points3 = [];
+% 初始化可达的接触点,检查每个象限的候选接触点是否在对应手指的工作空间内
+% reachable_points1 = find_reachable_points_dt(points_sector1, dt1);
+% reachable_points2 = find_reachable_points_dt(points_sector2, dt2);
+% reachable_points3 = find_reachable_points_dt(points_sector3, dt3);
+reachable_points1 = find_reachable_points_shp(points_sector1, shp1);
+reachable_points2 = find_reachable_points_shp(points_sector2, shp2);
+reachable_points3 = find_reachable_points_shp(points_sector3, shp3);
 
-% 检查每个象限的候选接触点是否在对应手指的工作空间内
-for i = 1:size(points_sector1, 1)
-    contact_point = points_sector1(i, :);
-    is_reachable1 = is_point_in_workspace(dt1, contact_point);% 判断是否在手指的工作空间内
-    if is_reachable1
-        reachable_points1 = [reachable_points1; contact_point];
+% 确保形成稳定的抓取三角形 %用物体重心与三角形质心之间的欧氏距离判断
+distance_threshold = 3;%稳定阀值
+if ~isempty(reachable_points1) && ~isempty(reachable_points2) && ~isempty(reachable_points3)
+    % 初始化最小距离和对应的接触点
+    min_distance = inf;
+    best_cp1 = [];
+    best_cp2 = [];
+    best_cp3 = [];
+    
+    % 遍历所有可能的接触点组合
+    for i = 1:size(reachable_points1, 1)
+        for j = 1:size(reachable_points2, 1)
+            for k = 1:size(reachable_points3, 1)
+                cp1 = reachable_points1(i, :);
+                cp2 = reachable_points2(j, :);
+                cp3 = reachable_points3(k, :);
+
+                % 检查三个点是否共线
+                if ~iscollinear(cp1, cp2, cp3)
+                    % 计算接触点的质心
+                    centroid = (cp1 + cp2 + cp3) / 3;
+
+                    % 计算质心与球心之间的距离
+                    distance = norm(centroid - ball_center);
+
+                    % 更新最小距离和最佳接触点
+                    if distance < min_distance
+                        min_distance = distance;
+                        best_cp1 = cp1;
+                        best_cp2 = cp2;
+                        best_cp3 = cp3;
+                    end
+                end
+            end
+        end
     end
-end
-
-for i = 1:size(points_sector2, 1)
-    contact_point = points_sector2(i, :);
-    is_reachable2 = is_point_in_workspace(dt2, contact_point);
-    if is_reachable2
-        reachable_points2 = [reachable_points2; contact_point];
-    end
-end
-
-for i = 1:size(points_sector3, 1)
-    contact_point = points_sector3(i, :);
-    is_reachable3 = is_point_in_workspace(dt3, contact_point);
-    if is_reachable3
-        reachable_points3 = [reachable_points3; contact_point];
-    end
-end
-
-% 确保形成稳定的抓取三角形 %可以用物体重心与三角形质心之间的欧氏距离判断
-if size(reachable_points1, 1) >= 1 && size(reachable_points2, 1) >= 1 && size(reachable_points3, 1) >= 1
-    % 选择每个象限中的第一个点
-    cp1 = reachable_points1(1, :);
-    cp2 = reachable_points2(1, :);
-    cp3 = reachable_points3(1, :);  
-%     while iscollinear(cp1, cp2, cp3)% 检查三个点是否共线
-%         % 如果共线，则随机选择下一个点
-%         cp1 = reachable_points1(randi(size(reachable_points1, 1)), :);
-%         cp2 = reachable_points2(randi(size(reachable_points2, 1)), :);
-%         cp3 = reachable_points3(randi(size(reachable_points3, 1)), :);
-%     end
+    
+    % 显示结果
     disp('选择的接触点:');
-    disp(cp1);
-    disp(cp2);
-    disp(cp3);
+    disp(best_cp1);
+    disp(best_cp2);
+    disp(best_cp3);
+    disp('接触点质心:');
+    disp((best_cp1 + best_cp2 + best_cp3) / 3);
+    disp('质心与球心之间的距离:');
+    disp(min_distance);
+
+    if min_distance < distance_threshold
+        disp('形成稳定的抓取三角形');
+    else
+        disp('抓取三角形不稳定');
+    end
 else
     disp('没有足够的可达接触点来形成稳定的抓取');
 end
@@ -106,9 +125,9 @@ plot3(candidate_points(:,1),candidate_points(:,2),candidate_points(:,3),'k.','Ma
 plot3(reachable_points1(:, 1), reachable_points1(:, 2), reachable_points1(:, 3), 'r.', 'MarkerSize', 5, 'LineWidth', 1);
 plot3(reachable_points2(:, 1), reachable_points2(:, 2), reachable_points2(:, 3), 'g.', 'MarkerSize', 5, 'LineWidth', 1);
 plot3(reachable_points3(:, 1), reachable_points3(:, 2), reachable_points3(:, 3), 'b.', 'MarkerSize', 5, 'LineWidth', 1);
-plot3(cp1(1), cp1(2), cp1(3), 'ro', 'MarkerSize', 10, 'LineWidth', 4);
-plot3(cp2(1), cp2(2), cp2(3), 'go', 'MarkerSize', 10, 'LineWidth', 4);
-plot3(cp3(1), cp3(2), cp3(3), 'bo', 'MarkerSize', 10, 'LineWidth', 4);
+plot3(best_cp1(1), best_cp1(2), best_cp1(3), 'ro', 'MarkerSize', 10, 'LineWidth', 4);
+plot3(best_cp2(1), best_cp2(2), best_cp2(3), 'go', 'MarkerSize', 10, 'LineWidth', 4);
+plot3(best_cp3(1), best_cp3(2), best_cp3(3), 'bo', 'MarkerSize', 10, 'LineWidth', 4);
 
 % 绘制原始工作空间点（可选）
 % scatter3(workspace_points1(:,1), workspace_points1(:,2), workspace_points1(:,3), 'r.');
@@ -122,15 +141,15 @@ grid on;
 % hold off;
 axis equal;
 pause; 
-T1_pos=[cp1(1), cp1(2), cp1(3)];
-T2_pos=[cp2(1), cp2(2), cp2(3)];
-T3_pos=[cp3(1), cp3(2), cp3(3)];
+T1_pos=[best_cp1(1), best_cp1(2), best_cp1(3)];
+T2_pos=[best_cp2(1), best_cp2(2), best_cp2(3)];
+T3_pos=[best_cp3(1), best_cp3(2), best_cp3(3)];
 %% 绘制机械臂初始位姿及末端姿态
 DHFk_hand(q_1(2:end),q_2(2:end),q_3(2:end),true);
-plot3(T1_pos(1),T1_pos(2),T1_pos(3),'ro', 'MarkerSize', 5, 'LineWidth', 3); hold on;
-plot3(T2_pos(1),T2_pos(2),T2_pos(3),'go', 'MarkerSize', 5, 'LineWidth', 3); hold on;
-plot3(T3_pos(1),T3_pos(2),T3_pos(3),'bo', 'MarkerSize', 5, 'LineWidth', 3); hold on;
-DrawSphere(ball_center,ball_radius,0);
+% plot3(T1_pos(1),T1_pos(2),T1_pos(3),'ro', 'MarkerSize', 5, 'LineWidth', 3); hold on;
+% plot3(T2_pos(1),T2_pos(2),T2_pos(3),'go', 'MarkerSize', 5, 'LineWidth', 3); hold on;
+% plot3(T3_pos(1),T3_pos(2),T3_pos(3),'bo', 'MarkerSize', 5, 'LineWidth', 3); hold on;
+% DrawSphere(ball_center,ball_radius,0);
 drawnow;
 view(-21,12);
 title('机械臂初始位姿及末端点');
@@ -140,9 +159,9 @@ cla;hold on;
 done_1 = false;
 done_2 = false;
 done_3 = false;
-load('test_j_matrix.mat', 'test_j_matrix');
+load('J_matrix.mat', 'J_matrix');
 global mf;
-mf = matlabFunction(test_j_matrix);
+mf = matlabFunction(J_matrix);
 % profile on; % 开启性能分析
 tic
 while ~(done_1 && done_2 && done_3)
@@ -192,5 +211,23 @@ function is_in_workspace = is_point_in_workspace(dt, point)
     is_in_workspace = ~isnan(point_inside);
 end
 
+function reachable_points = find_reachable_points_dt(points_sector, dt)
+    reachable_points = [];
+    for i = 1:size(points_sector, 1)
+        contact_point = points_sector(i, :);
+        if is_point_in_workspace(dt, contact_point)
+            reachable_points = [reachable_points; contact_point];
+        end
+    end
+end
 
-
+function reachable_points = find_reachable_points_shp(points_sector, shp)
+    % 使用alphaShape检查点是否在多边形体内
+    reachable_points = [];
+    for i = 1:size(points_sector, 1)
+        contact_point = points_sector(i, :);
+        if inShape(shp, contact_point)
+            reachable_points = [reachable_points; contact_point];
+        end
+    end
+end
