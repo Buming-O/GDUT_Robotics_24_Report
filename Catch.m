@@ -2,6 +2,12 @@ clc;
 clear all;
 close all;
 num=0;
+
+% 定义物体参数
+mass = 0.5; % 物体质量，单位kg
+g = 9.81; % 重力加速度，单位m/s^2
+weight = mass * g; % 物体的重量
+
 learning_rate = 0.9;
 ToDeg = 180/pi;
 ToRad = pi/180;
@@ -19,7 +25,7 @@ shp2 = alphaShape(workspace_points2,60);
 shp3 = alphaShape(workspace_points3,60);
 % 定义球的半径和中心位置
 ball_radius = 40;
-ball_center = [10, 10, -70];
+ball_center = [0, 0, -60];
 
 global Link_1
 global Link_2
@@ -39,7 +45,7 @@ q_3=[-120,0,0,0,0];
 
 %% 规划目标末端位置
 % 在球的表面上生成候选接触点
-num_points = 50; % 候选接触点的数量
+num_points = 60; % 候选接触点的数量
 theta = linspace(0, 2*pi, num_points);
 phi = linspace(pi/2, pi, num_points);
 [Theta, Phi] = meshgrid(theta, phi);
@@ -49,7 +55,7 @@ Z = ball_radius * cos(Phi) + ball_center(3);
 candidate_points = [X(:), Y(:), Z(:)];
 % 划分候选接触点到三个象限
 theta_deg = rad2deg(Theta(:));
-angle_threshold = 20;
+angle_threshold = 10;
 points_sector1 = candidate_points(theta_deg >= 0-angle_threshold & theta_deg < 0+angle_threshold, :);
 points_sector2 = candidate_points(theta_deg >= 120-angle_threshold & theta_deg < 120+angle_threshold, :);
 points_sector3 = candidate_points(theta_deg >= 240-angle_threshold & theta_deg < 240+angle_threshold, :);
@@ -98,19 +104,14 @@ if ~isempty(reachable_points1) && ~isempty(reachable_points2) && ~isempty(reacha
             end
         end
     end
-    
     % 显示结果
-    disp('选择的接触点:');
-    disp(best_cp1);
-    disp(best_cp2);
-    disp(best_cp3);
-    disp('接触点质心:');
-    disp((best_cp1 + best_cp2 + best_cp3) / 3);
-    disp('质心与球心之间的距离:');
-    disp(min_distance);
-
+%     fprintf('选择的接触点:\n');
+%     fprintf('接触点1: %.4f, %.4f, %.4f\n', best_cp1);
+%     fprintf('接触点2: %.4f, %.4f, %.4f\n', best_cp2);
+%     fprintf('接触点3: %.4f, %.4f, %.4f\n', best_cp3);
+%     fprintf('接触点质心: %.4f, %.4f, %.4f\n', (best_cp1 + best_cp2 + best_cp3) / 3);
     if min_distance < distance_threshold
-        disp('形成稳定的抓取三角形');
+        fprintf('质心与球心之间的距离:%.4f,形成稳定的抓取三角形\n', min_distance);
     else
         disp('抓取三角形不稳定');
     end
@@ -118,6 +119,69 @@ else
     disp('没有足够的可达接触点来形成稳定的抓取');
 end
 
+%% 计算目标力矩
+% 初始猜测值
+f1_dir = rand(1, 3);
+f2_dir = rand(1, 3);
+f3_dir = rand(1, 3);
+% 单位化方向向量
+f1_dir = f1_dir / norm(f1_dir);
+f2_dir = f2_dir / norm(f2_dir);
+f3_dir = f3_dir / norm(f3_dir);
+f_dir_init = [f1_dir, f2_dir, f3_dir];
+
+% 目标函数
+fun = @(f_dir) objective_function(f_dir, best_cp1, best_cp2, best_cp3, ball_center,weight);
+
+% 优化设置
+options = optimoptions('fmincon', 'Display', 'notify-detailed', 'Algorithm', 'interior-point');
+% 优化约束条
+A = [];
+b = [];
+Aeq = [];
+beq = [];
+lb = [];
+ub = [];
+
+% 运行优化
+[f_dir_opt, fval] = fmincon(fun, f_dir_init, A, b, Aeq, beq, lb, ub, [], options);
+
+% 提取优化后的力方向
+f1_dir_opt = f_dir_opt(1:3);
+f2_dir_opt = f_dir_opt(4:6);
+f3_dir_opt = f_dir_opt(7:9);
+
+% 计算接触力的大小
+force_magnitude = weight / 3;
+
+% 计算每个接触点的力
+f1 = force_magnitude * f1_dir_opt / norm(f1_dir_opt);
+f2 = force_magnitude * f2_dir_opt / norm(f2_dir_opt);
+f3 = force_magnitude * f3_dir_opt / norm(f3_dir_opt);
+
+% 计算每个接触点相对于物体重心的力矩
+r1 = best_cp1 - ball_center;
+r2 = best_cp2 - ball_center;
+r3 = best_cp3 - ball_center;
+
+% 计算总力矩与总力
+total_torque = cross(r1, f1) + cross(r2, f2) + cross(r3, f3);
+total_force = f1 + f2 + f3 - [0,0, weight];
+% 使用 sprintf 将 norm_torque 转换为纯数字格式
+formatted_torque = sprintf('%.10f', norm(total_torque));
+% 确保所有力和力矩的和小于容忍值
+if norm(total_torque) < 1e-4 && norm(total_force) < 5e-1
+    disp([formatted_torque,'N/m, ',num2str(norm(total_force)),'N, 力矩与力平衡，抓取稳定']);
+else
+    disp('力矩或力不平衡，抓取不稳定');
+end
+
+% fprintf('接触点1的力：%.4f, %.4f, %.4f\n', f1);
+% fprintf('接触点2的力：%.4f, %.4f, %.4f\n', f2);
+% fprintf('接触点3的力：%.4f, %.4f, %.4f\n', f3);
+% fprintf('总力矩：%.4f, %.4f, %.4f\n', total_torque);
+% fprintf('总力：%.4f, %.4f, %.4f\n', total_force);
+%% 画球的接触点
 figure;
 DrawSphere(ball_center,ball_radius,0);
 hold on;
@@ -153,6 +217,7 @@ DHFk_hand(q_1(2:end),q_2(2:end),q_3(2:end),true);
 drawnow;
 view(-21,12);
 title('机械臂初始位姿及末端点');
+disp('机械臂初始位姿及末端点已显示');
 pause; 
 cla;hold on;
 %% 求解逆运动学
@@ -176,7 +241,8 @@ while ~(done_1 && done_2 && done_3)
         [q_3, done_3] = IK_Sol(Link_3, q_3, T3_pos, learning_rate);
     end
     num=num+1;
-    if(num>1000)
+    if(num>100)
+        disp("逆解失败");
         break;
     end
 end
@@ -230,4 +296,30 @@ function reachable_points = find_reachable_points_shp(points_sector, shp)
             reachable_points = [reachable_points; contact_point];
         end
     end
+end
+
+function cost = objective_function(f_dir, cp1, cp2, cp3, ball_center,weight)
+    f1_dir = f_dir(1:3);
+    f2_dir = f_dir(4:6);
+    f3_dir = f_dir(7:9);
+
+    f1_dir = f1_dir / norm(f1_dir);
+    f2_dir = f2_dir / norm(f2_dir);
+    f3_dir = f3_dir / norm(f3_dir);
+
+
+    force_magnitude =  weight / 3; % 假设每个接触力的大小相等
+
+    f1 = force_magnitude * f1_dir;
+    f2 = force_magnitude * f2_dir;
+    f3 = force_magnitude * f3_dir;
+
+    r1 = cp1 - ball_center;
+    r2 = cp2 - ball_center;
+    r3 = cp3 - ball_center;
+
+    total_torque = cross(r1, f1) + cross(r2, f2) + cross(r3, f3);
+    total_force = f1 + f2 + f3 - [0,0, weight];
+
+    cost = norm(total_torque) + 10*norm(total_force); % 最小化力和力矩的不平衡量
 end
