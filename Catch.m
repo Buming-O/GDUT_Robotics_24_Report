@@ -20,9 +20,10 @@ load('workspace_points3.mat', 'workspace_points3');
 % dt2 = delaunayTriangulation(workspace_points2);
 % dt3 = delaunayTriangulation(workspace_points3);
 % 使用alphaShape检查点是否在多边形体内
-shp1 = alphaShape(workspace_points1,60);
-shp2 = alphaShape(workspace_points2,60);
-shp3 = alphaShape(workspace_points3,60);
+alpha_r=40;
+shp1 = alphaShape(workspace_points1,alpha_r);
+shp2 = alphaShape(workspace_points2,alpha_r);
+shp3 = alphaShape(workspace_points3,alpha_r);
 % 定义球的半径和中心位置
 ball_radius = 40;
 ball_center = [0, 0, -60];
@@ -263,11 +264,9 @@ drawnow;
 
 %%
 
-% 辅助函数：检查三个点是否共线
-function flag = iscollinear(p1, p2, p3)
-    v1 = p2 - p1;
-    v2 = p3 - p1;
-    flag = norm(cross(v1, v2)) < 1e-6;
+% 检查三个点是否共线
+function result = iscollinear(p1, p2, p3)
+    result = norm(cross(p2 - p1, p3 - p1)) < 1e-10;
 end
 
 function is_in_workspace = is_point_in_workspace(dt, point)

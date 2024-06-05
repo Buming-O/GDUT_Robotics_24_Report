@@ -31,9 +31,10 @@ ball_center = [0, -46, -65];
 load('workspace_points1.mat', 'workspace_points1');
 load('workspace_points2.mat', 'workspace_points2');
 load('workspace_points3.mat', 'workspace_points3');
-dt1 = alphaShape(workspace_points1,60);
-dt2 = alphaShape(workspace_points2,60);
-dt3 = alphaShape(workspace_points3,60);
+r=40;
+dt1 = alphaShape(workspace_points1,r);
+dt2 = alphaShape(workspace_points2,r);
+dt3 = alphaShape(workspace_points3,r);
 % 绘制凸包
 figure;
 hold on;
@@ -45,8 +46,8 @@ hold on;
 % 'EdgeColor', 'b', 'FaceColor', [0.8, 0.8, 0.8], 'LineWidth', 2);
 disp(dt1.Alpha)
 plot(dt1);
-plot(dt2);
-plot(dt3);
+% plot(dt2);
+% plot(dt3);
 scatter3(workspace_points1(:,1), workspace_points1(:,2), workspace_points1(:,3), 'r.');
 scatter3(workspace_points2(:,1), workspace_points2(:,2), workspace_points2(:,3), 'g.');
 scatter3(workspace_points3(:,1), workspace_points3(:,2), workspace_points3(:,3), 'b.');
