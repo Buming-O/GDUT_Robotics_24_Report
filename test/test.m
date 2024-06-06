@@ -23,6 +23,13 @@ Build;
 
 % pinv(j1)
 % pinv(j2)
+global Link_1
+global Link_2
+global Link_3
+Build;
+q_0=zeros(1,4);
+q_1=[0,20,0,0];
+DHFk_hand(q_1,q_0,q_0,true);
 
 % 定义球的半径和中心位置
 ball_radius = 40;
@@ -36,7 +43,7 @@ dt1 = alphaShape(workspace_points1,r);
 dt2 = alphaShape(workspace_points2,r);
 dt3 = alphaShape(workspace_points3,r);
 % 绘制凸包
-figure;
+% figure;
 hold on;
 % trisurf(convexHull(dt1), dt1.Points(:,1), dt1.Points(:,2), dt1.Points(:,3), ...
 % 'EdgeColor', 'r', 'FaceColor', [0.8, 0.8, 0.8], 'LineWidth', 2);
