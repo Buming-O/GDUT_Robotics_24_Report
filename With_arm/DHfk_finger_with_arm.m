@@ -19,12 +19,16 @@ azz=[1,0,0,0;
       0,1,0,0;
       0,0,-1,0;
       0,0,0,1];
-Link(1).A= Link_Arm(7).A*azz*Link(1).A;%机械臂向下
+axx=[-1,0,0,0;
+      0,1,0,0;
+      0,0,1,0;
+      0,0,0,1];
+Link(1).A= Link_Arm(7).A*azz*axx*Link(1).A;%机械臂向下,X轴反转
 Link(1).p = Link(1).A(:,4);
-Link(i).n= Link(1).A(:,1);
-Link(i).o= Link(1).A(:,2);
-Link(i).a= Link(1).A(:,3);
-Link(1).R = Link(1).A(1:3,1:3);
+Link(1).n = Link(1).A(:,1);
+Link(1).o = Link(1).A(:,2);
+Link(1).a = Link(1).A(:,3);
+Link(1).R=  [Link(1).n(1:3),Link(1).o(1:3),Link(1).a(1:3)];
 for i=2:5
       Link(i).A= Link(i-1).A*Link(i).A;
       Link(i).p= Link(i).A(:,4);

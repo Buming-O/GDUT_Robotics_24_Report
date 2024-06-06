@@ -18,8 +18,6 @@ alpha_r=30;
 shp1 = alphaShape(workspace_points1,alpha_r);
 shp2 = alphaShape(workspace_points2,alpha_r);
 shp3 = alphaShape(workspace_points3,alpha_r);
-
-learning_rate = 0.8;
 global th2_min th2_max th3_min th3_max th4_min th4_max th5_min th5_max;
 th2_min=-90; th2_max=90;   % Range for th2
 th3_min=0; th3_max=60;  % Range for th3
@@ -53,6 +51,7 @@ drawnow;
 pause;
 %% 机械臂逆解
 done_arm = false;
+learning_rate = 0.8;
 num=0;
 while ~done_arm
     Link_Arm=DHfk_J_Puma560(Link_Arm,q_arm,false);
@@ -73,9 +72,10 @@ angle_threshold = 5 ;
 distance_threshold = 3;%稳定阀值
 [best_cp1, best_cp2, best_cp3] = Planning_point_with_arm(catch_ball_center, catch_ball_radius, num_points, angle_threshold, distance_threshold, shp1, shp2, shp3);
 T1_pos=[best_cp1(1), best_cp1(2), best_cp1(3)];
-T3_pos=[best_cp2(1), best_cp2(2), best_cp2(3)];
-T2_pos=[best_cp3(1), best_cp3(2), best_cp3(3)];
+T2_pos=[best_cp2(1), best_cp2(2), best_cp2(3)];
+T3_pos=[best_cp3(1), best_cp3(2), best_cp3(3)];
 pause;
+hold off;
 %% 求解逆运动学
 learning_rate=1;
 num=0;
@@ -110,6 +110,8 @@ toc
 % profile viewer; % 显示性能分析结果
 disp(['迭代次数: ', num2str(num)]);
 disp(['Done_1: ', num2str(done_1),'  |  Done_2: ', num2str(done_2),'  |  Done_3: ', num2str(done_3)]);
+Link_Arm=DHfk_J_Puma560(Link_Arm,q_arm,true);
 DHFk_hand_with_arm(Link_Arm,q_1(2:end),q_2(2:end),q_3(2:end),true);
+DrawSphere(catch_ball_center,catch_ball_radius,0);
 drawnow;
 

@@ -22,7 +22,7 @@ load('workspace_points3.mat', 'workspace_points3');
 % 使用alphaShape检查点是否在多边形体内
 alpha_r=40;
 shp1 = alphaShape(workspace_points1,alpha_r);
-shp2 = alphaShape(workspace_points2,alpha_r  );
+shp2 = alphaShape(workspace_points2,alpha_r);
 shp3 = alphaShape(workspace_points3,alpha_r);
 % 定义球的半径和中心位置
 ball_radius = 40;
