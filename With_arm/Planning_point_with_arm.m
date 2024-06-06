@@ -1,4 +1,4 @@
-function [best_cp1, best_cp2, best_cp3] = Planning_point(ball_center, ball_radius, num_points, angle_threshold, distance_threshold, shp1, shp2, shp3)
+function [best_cp1, best_cp2, best_cp3] = Planning_point_with_arm(ball_center, ball_radius, num_points, angle_threshold, distance_threshold, shp1, shp2, shp3)
     % 在球的表面上生成候选接触点
     theta = linspace(0, 2*pi, num_points);
     phi = linspace(pi/2, pi, num_points);
@@ -10,14 +10,14 @@ function [best_cp1, best_cp2, best_cp3] = Planning_point(ball_center, ball_radiu
     
     % 划分候选接触点到三个象限
     theta_deg = rad2deg(Theta(:));
-    points_sector1 = candidate_points(theta_deg >= 0-angle_threshold & theta_deg < 0+angle_threshold, :);
-    points_sector2 = candidate_points(theta_deg >= 120-angle_threshold & theta_deg < 120+angle_threshold, :);
-    points_sector3 = candidate_points(theta_deg >= 240-angle_threshold & theta_deg < 240+angle_threshold, :);
+    points_sector1 = candidate_points(theta_deg >= 180-angle_threshold & theta_deg < 180+angle_threshold, :);
+    points_sector2 = candidate_points(theta_deg >= 300-angle_threshold & theta_deg < 300+angle_threshold, :);
+    points_sector3 = candidate_points(theta_deg >= 60-angle_threshold & theta_deg < 60+angle_threshold, :);
 
     % 初始化可达的接触点
-    reachable_points1 = find_reachable_points_shp(points_sector1, shp1);
-    reachable_points2 = find_reachable_points_shp(points_sector2, shp2);
-    reachable_points3 = find_reachable_points_shp(points_sector3, shp3);
+    reachable_points1 = points_sector1;
+    reachable_points2 = points_sector2;
+    reachable_points3 = points_sector3;
 
     % 确保形成稳定的抓取三角形
     if ~isempty(reachable_points1) && ~isempty(reachable_points2) && ~isempty(reachable_points3)

@@ -8,7 +8,7 @@ mass = 0.5; % 物体质量，单位kg
 g = 9.81; % 重力加速度，单位m/s^2
 weight = mass * g; % 物体的重量
 
-learning_rate = 0.9;
+learning_rate = 0.9;    
 ToDeg = 180/pi;
 ToRad = pi/180;
 % 加载手指的工作空间点
@@ -22,7 +22,7 @@ load('workspace_points3.mat', 'workspace_points3');
 % 使用alphaShape检查点是否在多边形体内
 alpha_r=40;
 shp1 = alphaShape(workspace_points1,alpha_r);
-shp2 = alphaShape(workspace_points2,alpha_r);
+shp2 = alphaShape(workspace_points2,alpha_r  );
 shp3 = alphaShape(workspace_points3,alpha_r);
 % 定义球的半径和中心位置
 ball_radius = 40;
@@ -40,9 +40,9 @@ th4_min=0; th4_max=60;   % Range for th4
 th5_min=0; th5_max=80;     % Range for th5
 
 %% 输入起始六关节位置
-q_1=[0,0,10,0,0];
-q_2=[120,0,10,0,0];
-q_3=[-120,0,10,0,0];
+q_1=[0,0,0,0,0];
+q_2=[120,0,0,0,0];
+q_3=[-120,0,0,0,0];
 
 %% 规划目标末端位置
 % 在球的表面上生成候选接触点

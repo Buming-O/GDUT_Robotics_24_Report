@@ -1,5 +1,6 @@
-function [q_value, done] = IK_Sol(Link,q_value,Tpos,learning_rate)
+function [q_value, done] = IK_Sol_with_arm(Link,q_value,Tpos,learning_rate)
 ToDeg = 180/pi;
+
 %获取机械臂末端当前位置
 ex=Link(5).p(1);
 ey=Link(5).p(2);
@@ -7,8 +8,8 @@ ez=Link(5).p(3);
 
 global th2_min th2_max th3_min th3_max th4_min th4_max th5_min th5_max;
 % 计算误差
-p_err =[Tpos(1)-ex, Tpos(2)-ey, Tpos(3)-ez]' ;%计算位置误差
-% disp(p_err')
+p_err =[-(Tpos(1)-ex), Tpos(2)-ey, Tpos(3)-ez]' ;%计算位置误差,这里x是负的原因是绕z轴转了180度？
+disp(p_err')
 Loss = norm(p_err);  %误差评价
 % disp(Loss);
 % 小于期望误差则结束迭代
@@ -21,6 +22,7 @@ end
 
 %否则计算雅可比矩阵并计算角度修正量
 J=Jacobian_finger(q_value);
+% J=aa*J;
 % disp(J)
 dth = learning_rate * pinv(J) * p_err * ToDeg;  %计算修正量，此处单位为弧度
 % disp(dth')
