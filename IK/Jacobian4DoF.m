@@ -1,6 +1,5 @@
 function J=Jacobian4DoF(Link,q_th_vaule)
 % close all
-global Link
 
 jsize=5;
 J=zeros(6,jsize);
@@ -13,7 +12,7 @@ Link(5).th=q_th_vaule(5)*pi/180;
 for i=1:5
     Link=Matrix_dh(Link,i);
 end
-
+% 
 Link(1).p=Link(1).p(1:3);
 for i=2:5
     Link(i).A=Link(i-1).A*Link(i).A;

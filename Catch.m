@@ -32,7 +32,9 @@ global Link_1
 global Link_2
 global Link_3
 Build;
-% load('Link_1.mat','Link_1');load('Link_2.mat','Link_2');load('Link_3.mat','Link_3');
+% load('Link_1.mat','Link_1');
+% load('Link_2.mat','Link_2');
+% load('Link_3.mat','Link_3');
 global th2_min th2_max th3_min th3_max th4_min th4_max th5_min th5_max;
 th2_min=-90; th2_max=90;   % Range for th2
 th3_min=0; th3_max=60;  % Range for th3
@@ -208,7 +210,7 @@ axis equal;
 pause; 
 T1_pos=[best_cp1(1), best_cp1(2), best_cp1(3)];
 T2_pos=[best_cp2(1), best_cp2(2), best_cp2(3)];
-T3_pos=[best_cp3(1), best_cp3(2), best_cp3(3)];
+T3_pos=[best_cp3(1), best_cp3(2), best_cp3(3)];  
 %% 绘制机械臂初始位姿及末端姿态
 DHFk_hand(q_1(2:end),q_2(2:end),q_3(2:end),true);
 % plot3(T1_pos(1),T1_pos(2),T1_pos(3),'ro', 'MarkerSize', 5, 'LineWidth', 3); hold on;
@@ -228,28 +230,28 @@ done_3 = false;
 load('J_matrix.mat', 'J_matrix');
 global mf;
 mf = matlabFunction(J_matrix);
-% profile on; % 开启性能分析
+profile on; % 开启性能分析
 tic
 while ~(done_1 && done_2 && done_3)
     DHFk_hand(q_1(2:end),q_2(2:end),q_3(2:end),false); % FK计算并绘制机器人
     if ~done_1
         [q_1, done_1] = IK_Sol(Link_1, q_1, T1_pos, learning_rate);
     end
-    if ~done_2
+    if ~done_2 
         [q_2, done_2] = IK_Sol(Link_2, q_2, T2_pos, learning_rate);
     end
     if ~done_3
         [q_3, done_3] = IK_Sol(Link_3, q_3, T3_pos, learning_rate);
     end
     num=num+1;
-    if(num>100)
+    if(num>8)
         disp("逆解失败");
         break;
     end
 end
 toc
-% profile off; % 关闭性能分析
-% profile viewer; % 显示性能分析结果
+profile off; % 关 闭性能分析
+profile viewer; % 显示性能分析结果
 disp(['迭代次数: ', num2str(num)]);
 disp(['Done_1: ', num2str(done_1),'  |  Done_2: ', num2str(done_2),'  |  Done_3: ', num2str(done_3)]);
 

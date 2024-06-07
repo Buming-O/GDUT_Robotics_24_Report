@@ -8,7 +8,7 @@ ez=Link(5).p(3);
 global th2_min th2_max th3_min th3_max th4_min th4_max th5_min th5_max;
 % 计算误差
 p_err =[Tpos(1)-ex, Tpos(2)-ey, Tpos(3)-ez]' ;%计算位置误差
-% disp(p_err')
+% w_err=[0 0 0]';
 Loss = norm(p_err);  %误差评价
 % disp(Loss);
 % 小于期望误差则结束迭代
@@ -21,8 +21,10 @@ end
 
 %否则计算雅可比矩阵并计算角度修正量
 J=Jacobian_finger(q_value);
+% J=Jacobian4DoF(Link,q_value);
 % disp(J)
 dth = learning_rate * pinv(J) * p_err * ToDeg;  %计算修正量，此处单位为弧度
+% dth = learning_rate * pinv(J) * [p_err;w_err] * ToDeg;  %计算修正量，此处单位为弧度
 % disp(dth')
 % 计算修正后的关节角度
 q_value(2) = q_value(2) + dth(1);
@@ -37,7 +39,7 @@ q_value(5) = max(min(q_value(5), th5_max), th5_min);
 % 
 % disp(q_value)
 %可以记录下点，完成逆运动学后统一绘制
-plot3(ex,ey,ez,'r.');
+% plot3(ex,ey,ez,'r.');
 % drawnow;
 return;
 end
