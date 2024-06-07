@@ -11,7 +11,8 @@ function DHFk_hand(inputArg1,inputArg2,inputArg3,Draw)
     Link_3=DHfk_finger(Link_3,inputArg3,Draw);
     if Draw
 %         cla;
-        axis([-200,200,-200,200,-200,200]);
+        axis([-150,150,-150,150,-150,150]);
+%         axis([-200,200,-200,200,-200,200]);
         xlabel('x');
         ylabel('y');
         zlabel('z');

@@ -86,7 +86,7 @@ plot3(smoothed_path3(end, 1), smoothed_path3(end, 2), smoothed_path3(end, 3), 'b
 
 DHFk_hand(q_start,q_start,q_start,true);
 DrawSphere(ball_center,ball_radius,0);
-% DrawSphere(catch_ball_center,catch_ball_radius,0);
+DrawSphere(catch_ball_center,catch_ball_radius,0);
 % plot(shp1)
 % plot(shp2)
 % plot(shp3)
@@ -172,6 +172,7 @@ for i = 1:max_size
     end
     drawnow;
 end
+
 %% 绘制机器人
 % for i = 1:size(joint_angles1, 1)
 %     DHfk_finger(Link_1,joint_angles1(i,2:end),true);

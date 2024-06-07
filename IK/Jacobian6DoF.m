@@ -1,4 +1,4 @@
-function J=Jacobian6DoF_Ln(Link,q_value)
+function J=Jacobian6DoF(Link,q_value)
 % close all
 
 jsize=6;
