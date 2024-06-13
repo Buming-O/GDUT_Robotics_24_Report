@@ -230,7 +230,7 @@ done_3 = false;
 load('J_matrix.mat', 'J_matrix');
 global mf;
 mf = matlabFunction(J_matrix);
-profile on; % 开启性能分析
+% profile on; % 开启性能分析
 tic
 while ~(done_1 && done_2 && done_3)
     DHFk_hand(q_1(2:end),q_2(2:end),q_3(2:end),false); % FK计算并绘制机器人
@@ -250,8 +250,8 @@ while ~(done_1 && done_2 && done_3)
     end
 end
 toc
-profile off; % 关 闭性能分析
-profile viewer; % 显示性能分析结果
+% profile off; % 关 闭性能分析
+% profile viewer; % 显示性能分析结果
 disp(['迭代次数: ', num2str(num)]);
 disp(['Done_1: ', num2str(done_1),'  |  Done_2: ', num2str(done_2),'  |  Done_3: ', num2str(done_3)]);
 

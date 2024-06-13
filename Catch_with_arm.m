@@ -54,7 +54,7 @@ done_arm = false;
 learning_rate = 0.8;
 num=0;
 while ~done_arm
-    Link_Arm=DHfk_J_Puma560(Link_Arm,q_arm,false);
+    Link_Arm=DHfk_J_Puma560(Link_Arm,q_arm,true);
     [q_arm,done_arm]=Arm_IK_Sol(Link_Arm,q_arm,T_arm,TR_arm,learning_rate);
     num=num+1;
     if(num>300)
@@ -65,6 +65,7 @@ end
 disp(num);
 Link_Arm=DHfk_J_Puma560(Link_Arm,q_arm,true);
 DHFk_hand_with_arm(Link_Arm,q_1(2:end),q_2(2:end),q_3(2:end),true);
+DrawSphere(catch_ball_center,catch_ball_radius,0);
 drawnow;
 %% 抓取点规划
 num_points = 60;
@@ -89,7 +90,7 @@ mf = matlabFunction(J_matrix);
 tic
 % while ~done_1
 while ~(done_1 && done_2 && done_3)
-    DHFk_hand_with_arm(Link_Arm,q_1(2:end),q_2(2:end),q_3(2:end),false);
+    DHFk_hand_with_arm(Link_Arm,q_1(2:end),q_2(2:end),q_3(2:end),true);
     if ~done_1
         [q_1, done_1] = IK_Sol_with_arm(Link_1, q_1, T1_pos, learning_rate);
     end

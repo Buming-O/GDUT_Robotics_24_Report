@@ -73,6 +73,7 @@ scatter3(workspace_points3(:,1), workspace_points3(:,2), workspace_points3(:,3),
 % save('workspace_points3.mat', 'workspace_points3');
 
 %%
+axis auto;
 plot3(0, 0, 0, 'g+', 'MarkerSize', 10);
 xlabel('X');
 ylabel('Y');
@@ -80,4 +81,3 @@ zlabel('Z');
 title('ROM');
 grid on;
 hold off;
-axis auto;

@@ -1,6 +1,8 @@
-function Link=DHfk_J_Puma560_Lnya(Link,q_arm,Draw)
+function Link=DHfk_J_Puma560(Link,q_arm,Draw)
 % close all
-
+if Draw
+cla;
+end
 % global Link
 radius    = 25;  %25
 len       = 60;  %60
@@ -41,12 +43,13 @@ for i=2:7
 end
 % view(125,52);
 % set (gcf,'Position',[650,100,700,600])
-axis([-900,900,-900,900,-100,1600]);
+axis([-900,900,-900,900,0,1200]);
 % xlabel('x');
 % ylabel('y'); 
 % zlabel('z');
 % grid on;
-% drawnow;
+drawnow;
+% hold off;
 % if(fcla)
 %     cla;
 % end

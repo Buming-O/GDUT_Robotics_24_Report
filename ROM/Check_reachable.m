@@ -4,7 +4,7 @@ load('workspace_points2.mat', 'workspace_points2');
 load('workspace_points3.mat', 'workspace_points3');
 
 % 定义球的半径
-ball_radius = 40;
+ball_radius = 20;
 
 % 定义网格范围和分辨率
 x_range = -100:5:100;

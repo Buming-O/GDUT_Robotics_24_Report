@@ -11,7 +11,7 @@ FK = matlabFunction(T0end);
 load('workspace_points1.mat', 'workspace_points1');
 load('workspace_points2.mat', 'workspace_points2');
 load('workspace_points3.mat', 'workspace_points3');
-alpha_r=30;
+alpha_r=20;
 shp1 = alphaShape(workspace_points1,alpha_r);
 shp2 = alphaShape(workspace_points2,alpha_r);
 shp3 = alphaShape(workspace_points3,alpha_r);
@@ -55,9 +55,15 @@ start_point2 = FK_end_point(Link_2,q_start);
 % goal_point2 = [-21.2168363247897	33.9093771155868	-60];
 start_point3 = FK_end_point(Link_3,q_start);
 % goal_point3 = [-17.4922928183542	-35.9724852068488	-60];
-[path1,explored_points1] = RRT(shp1,workspace_limits,start_point1,goal_point1,ball_center,ball_radius);
-[path2,explored_points2] = RRT(shp2,workspace_limits,start_point2,goal_point2,ball_center,ball_radius);
-[path3,explored_points3] = RRT(shp3,workspace_limits,start_point3,goal_point3,ball_center,ball_radius);
+% [path1,explored_points1] = RRT(shp1,workspace_limits,start_point1,goal_point1,ball_center,ball_radius);
+% [path2,explored_points2] = RRT(shp2,workspace_limits,start_point2,goal_point2,ball_center,ball_radius);
+% [path3,explored_points3] = RRT(shp3,workspace_limits,start_point3,goal_point3,ball_center,ball_radius);
+
+[path1, explored_points1] = RRT_star(shp1, workspace_limits, start_point1, goal_point1, ball_center, ball_radius);
+[path2, explored_points2] = RRT_star(shp2, workspace_limits, start_point2, goal_point2, ball_center, ball_radius);
+[path3, explored_points3] = RRT_star(shp3, workspace_limits, start_point3, goal_point3, ball_center, ball_radius);
+
+
 
 
 %% 显示路径
@@ -69,13 +75,13 @@ smoothed_path2 = smooth_end_effector_path(path2);
 smoothed_path3 = smooth_end_effector_path(path3);
 
 % 显示所有遍历到的点
-plot3(explored_points1(:, 1), explored_points1(:, 2), explored_points1(:, 3), 'b.', 'MarkerSize', 1, 'MarkerFaceColor', 'k');
-plot3(explored_points2(:, 1), explored_points2(:, 2), explored_points2(:, 3), 'b.', 'MarkerSize', 1, 'MarkerFaceColor', 'k');
-plot3(explored_points3(:, 1), explored_points3(:, 2), explored_points3(:, 3), 'b.', 'MarkerSize', 1, 'MarkerFaceColor', 'k');
+plot3(explored_points1(:, 1), explored_points1(:, 2), explored_points1(:, 3), 'r.', 'MarkerSize', 1.5, 'MarkerFaceColor', 'k');
+plot3(explored_points2(:, 1), explored_points2(:, 2), explored_points2(:, 3), 'g.', 'MarkerSize', 1.5, 'MarkerFaceColor', 'k');
+plot3(explored_points3(:, 1), explored_points3(:, 2), explored_points3(:, 3), 'b.', 'MarkerSize', 1.5, 'MarkerFaceColor', 'k');
 % 绘制末端轨迹
-% plot3(smoothed_path1(:, 1), smoothed_path1(:, 2), smoothed_path1(:, 3), 'r-', 'LineWidth', 1);
-% plot3(smoothed_path2(:, 1), smoothed_path2(:, 2), smoothed_path2(:, 3), 'r-', 'LineWidth', 1);
-% plot3(smoothed_path3(:, 1), smoothed_path3(:, 2), smoothed_path3(:, 3), 'r-', 'LineWidth', 1);
+plot3(smoothed_path1(:, 1), smoothed_path1(:, 2), smoothed_path1(:, 3), 'r-', 'LineWidth', 1);
+plot3(smoothed_path2(:, 1), smoothed_path2(:, 2), smoothed_path2(:, 3), 'r-', 'LineWidth', 1);
+plot3(smoothed_path3(:, 1), smoothed_path3(:, 2), smoothed_path3(:, 3), 'r-', 'LineWidth', 1);
 % 标记起点和终点
 plot3(smoothed_path1(1, 1), smoothed_path1(1, 2), smoothed_path1(1, 3), 'go', 'MarkerSize', 3, 'MarkerFaceColor', 'g'); % 起点
 plot3(smoothed_path2(1, 1), smoothed_path2(1, 2), smoothed_path2(1, 3), 'go', 'MarkerSize', 3, 'MarkerFaceColor', 'g'); % 起点

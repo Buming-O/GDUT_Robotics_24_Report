@@ -40,7 +40,7 @@ q_value(5) = max(min(q_value(5), th5_max), th5_min);
 % disp(q_value)
 %可以记录下点，完成逆运动学后统一绘制
 plot3(ex,ey,ez,'r.');
-% drawnow;
+drawnow;
 return;
 end
 
